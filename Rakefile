@@ -1,22 +1,18 @@
 require 'rubygems'
 require 'rake'
+require 'net/http'
+require 'fileutils'
+require 'rake/clean'
+require 'rake/gempackagetask'
 
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |gem|
-    gem.name = "jira4r-straightjacket"
-    gem.summary = %Q{JIRA Soap Interface Gem}
-    gem.description = %Q{JIRA Soap Interface Gem}
-    gem.email = "tastyhat@jamesstuart.org"
-    gem.homepage = "http://github.com/tastyhat/jira4r"
-    gem.authors = ["James Stuart"]
-    gem.add_dependency "soap4r-straightjacket"
-    gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
-    # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
-  end
-rescue LoadError
-  puts "Jeweler (or a dependency) not available. Install it with: sudo gem install jeweler"
-end
+require 'logger'
+
+gem 'soap4r-straightjacket', '~> 1.5.8'
+
+require 'wsdl/soap/wsdl2ruby'
+
+logger = Logger.new(STDERR)
+logger.level = Logger::INFO
 
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
@@ -25,51 +21,11 @@ Rake::TestTask.new(:test) do |test|
   test.verbose = true
 end
 
-begin
-  require 'rcov/rcovtask'
-  Rcov::RcovTask.new do |test|
-    test.libs << 'test'
-    test.pattern = 'test/**/test_*.rb'
-    test.verbose = true
-  end
-rescue LoadError
-  task :rcov do
-    abort "RCov is not available. In order to run rcov, you must: sudo gem install spicycode-rcov"
-  end
-end
-
-task :test => :check_dependencies
-
-task :default => :test
-
-require 'rake/rdoctask'
-Rake::RDocTask.new do |rdoc|
-  version = File.exist?('VERSION') ? File.read('VERSION') : ""
-
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "jira4r #{version}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
-end
-
-require 'net/http'
-require 'fileutils'
-require 'rake/clean'
-require 'rake/gempackagetask'
-
-gem 'soap4r-straightjacket'
-
-require 'wsdl/soap/wsdl2ruby'
-
 desc "gets the wsdl files for JIRA services"
 task :getwsdl do
   versions().each { |version| 
     save(getWsdlFileName(version), get_file("jira.codehaus.org", "/rpc/soap/jirasoapservice-v#{version}?wsdl"))
   }
-end
-
-task :build_gem do
-  system("gem build jira4r.gemspec")
 end
 
 task :clean do
@@ -80,14 +36,6 @@ task :clean do
   unl("lib/jira4r/v2/jiraService.rb")
   unl("lib/jira4r/v2/jiraServiceDriver.rb")
   unl("lib/jira4r/v2/jiraServiceMappingRegistry.rb")
-end
-
-task :install_gem do
-  system("gem install *.gem")
-end  
-
-task :deploy_gem do
-  system("scp *.gem codehaus03:/home/projects/jira4r/snapshots.dist/distributions/")
 end
 
 desc "generate the wsdl"
@@ -104,7 +52,7 @@ task :generate do
 
     # Create the server
     worker = WSDL::SOAP::WSDL2Ruby.new
-    #worker.logger = logger
+    worker.logger = logger
     worker.location = wsdl_url
     worker.basedir = basedir
     worker.opt['force'] = true
@@ -112,15 +60,6 @@ task :generate do
     worker.opt['module_path'] ="Jira4R::V#{version}"
     
     worker.opt['mapping_registry'] = true
-    #worker.run
-    
-    #Create the driver
-    #worker = WSDL::SOAP::WSDL2Ruby.new
-    #worker.logger = logger
-    #worker.location = wsdl_url
-    #worker.basedir = basedir
-    #worker.opt['force'] = true
-    #worker.opt['module_path'] = "Jira4R::V#{version}"
 
     worker.opt['driver'] = "JiraSoapService"
     worker.run
