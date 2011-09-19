@@ -859,6 +859,17 @@ module Jira4R
             :response_style => :rpc, :response_use => :encoded,
             :faults => {"Jira4R::V2::RemoteException_"=>{:use=>"encoded", :name=>"RemoteException", :ns=>"http://jira.atlassian.com/rpc/soap/jirasoapservice-v2", :namespace=>"http://jira.atlassian.com/rpc/soap/jirasoapservice-v2", :encodingstyle=>"http://schemas.xmlsoap.org/soap/encoding/"}} }
         ],
+        [ XSD::QName.new(NsSoapRpcJiraAtlassianCom, "getIssuesFromJqlSearch"),
+          "",
+          "getIssuesFromJqlSearch",
+          [ [:in, "in0", ["::SOAP::SOAPString"]],
+            [:in, "in1", ["::SOAP::SOAPString"]],
+            [:in, "in2", ["::SOAP::SOAPInt"]],
+            [:retval, "getIssuesFromJqlSearchReturn", ["Jira4R::V2::ArrayOf_tns1_RemoteIssue", "http://jira.codehaus.org/rpc/soap/jirasoapservice-v2", "ArrayOf_tns1_RemoteIssue"]] ],
+          { :request_style =>  :rpc, :request_use =>  :encoded,
+            :response_style => :rpc, :response_use => :encoded,
+            :faults => {"Jira4R::V2::RemoteException_"=>{:namespace=>"http://jira.codehaus.org/rpc/soap/jirasoapservice-v2", :ns=>"http://jira.codehaus.org/rpc/soap/jirasoapservice-v2", :encodingstyle=>"http://schemas.xmlsoap.org/soap/encoding/", :use=>"encoded", :name=>"RemoteException"}} }
+        ],
         [ XSD::QName.new(NsSoapRpcJiraAtlassianCom, "deleteUser"),
           "",
           "deleteUser",
