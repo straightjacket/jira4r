@@ -16,7 +16,8 @@ Gem::Specification.new do |s|
     "LICENSE",
      "README.rdoc"
   ]
-  s.files = [
+  s.files = Dir.glob("lib/**/*")
+  s.files << [
     ".document",
      ".gitignore",
      "LICENSE",
@@ -34,6 +35,7 @@ Gem::Specification.new do |s|
      "test/test_jira4r.rb",
      "wsdl/jirasoapservice-v2.wsdl"
   ]
+  s.files.flatten!
   s.homepage = %q{http://github.com/tastyhat/jira4r}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
@@ -44,19 +46,21 @@ Gem::Specification.new do |s|
      "test/test_jira4r.rb"
   ]
 
+  soap4r = 'soap4r-straightjacket'
+
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<soap4r>, [">= 0"])
+      s.add_runtime_dependency(soap4r, [">= 0"])
       s.add_development_dependency(%q<thoughtbot-shoulda>, [">= 0"])
     else
-      s.add_dependency(%q<soap4r>, [">= 0"])
+      s.add_dependency(soap4r, [">= 0"])
       s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
     end
   else
-    s.add_dependency(%q<soap4r>, [">= 0"])
+    s.add_dependency(soap4r, [">= 0"])
     s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
   end
 end
